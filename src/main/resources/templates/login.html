@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+<link rel="stylesheet" href="common.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ -->
+    <script language="javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    </head>
+    <body>
+    
+        <div id="container">
+            <div class="form-signin">
+                <h1>Connexion</h1>
+                
+                <label><b id="i">Nom d'utilisateur</b></label>
+                <input class="form-control" placeholder="Username" autofocus="true" type="text" id="usr"/>
+
+                <label><b>Mot de passe</b></label>
+                <input type="password" id="pass" class="form-control" placeholder="Password"/>
+
+                <button class="btn btn-lg btn-primary btn-block" type="button"  onclick="connexion()"> Se connecter !</button>
+</div>
+        </div>
+    
+		
+    </body>
+
+<script>
+
+	function connexion() {
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				usr : $("#usr").val(),
+				pass : $("#pass").val()
+			},
+			success : function(result) {
+				console.log('works!');
+				if(result.res == true){
+				window.location.href = '/twitter';
+				}
+				else if(result.res == false){
+					window.location.href = '/login';
+				}
+				},
+			error : function() {
+				console.log('ooos login!');
+			}
+			
+	});
+	}
+		</script> 
+</html>

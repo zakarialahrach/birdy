@@ -1,0 +1,212 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<script language="javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+ <script language="javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+   
+
+
+<meta charset="utf−8" />
+<title>Twitter</title>
+</head>
+<body onload="charger()">
+
+	<form id="formulaire" methode="GET" action="" class="form-group">
+	<h1>Twitter</h1>
+		<p align="center">
+		<h1 class="text-primary">Bonjour <span th:text="${nom}"></span></h1>
+		
+		</p>
+		<div align="center">
+		<label for="msg">Message :</label> <br />
+		<textarea class="" rows="5" cols="100" onKeyPress="if(event.keyCode == 13) Ajouter();" name="msg" id="comment_text"></textarea>
+			 
+		<button type="button"  onclick="Ajouter()">Click me !</button>
+				<button type="button"  onclick="deconnecter()">Se deconnecter!</button>
+	</div>
+	</form>
+		
+	<div align="center" class="container" id="messageView" accept-charset="utf-8"></div>
+</body>
+<script>
+
+ 	function Ajouter() {
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				msgAjt : $("#comment_text").val()
+			},
+			success : function(result) {
+				//console.log(result, result.id, result.msg);
+				/* for (i in result){
+					var ms = result[i];
+					$.each( ms, function( key, value ) {
+					//	lastId = "";
+						//lastId =  JSON.stringify(ms)
+					});
+				} */
+				console.log("ajouter "+result.id);
+				var r = jQuery('<div></div>').attr("class", "alert alert-info").attr("id",result.id);
+				var res = jQuery('<div></div>').attr("class", "success").text(result.msg+" Ajouté le "+result.date).attr("id",result.id);
+				var ress = jQuery('<input></input>').attr("class", "success").attr("type","button").attr("onclick","suppr('"+result.id+"')").attr("value","Supprimer");
+				var b = jQuery('<input></input>').attr("class", "success").attr("type","button").attr("onclick","jaime('"+result.id+"')").attr("value","J'aime");
+				var j = jQuery('<input></input>').attr("class", "success").attr("id","j"+result.id).attr("type","button").attr("value","0");
+				r.append(res);
+				r.append(ress);
+				r.append(b);
+				r.append(j);
+				$('#messageView').append(r);
+
+			},
+			error : function() {
+				console.log('oops! msg!');
+			}
+			
+	});	
+		$('#comment_text').val('');
+		//alert( (ms).toSource() )
+}
+	 
+	function deconnecter() {
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				deconn : "k"
+			},
+			success : function(result) {
+				console.log('deconnexion!');
+				if(result = "true"){
+					window.location.href = '/login'; 
+				}
+			},
+			error : function() {
+				console.log('oops');
+			}
+			
+	});	
+											
+					//alert( (ms).toSource() )
+}
+	
+	
+	function suppr(id) {
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				delById : id
+			},
+			success : function(result) {
+				//success
+				$('#'+id).remove();
+			},error : function() {
+				console.log('oops!');
+			}
+		});
+										
+}
+	
+	function jaime(id) {
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				jaime : id
+			},
+			success : function(result) {
+					document.getElementById("j"+id).value = result.nbJaime;
+				
+			},
+			error : function() {
+				console.log('oops! jaime!');
+			}
+			
+	});	
+		$('#comment_text').val('');
+		//alert( (ms).toSource() )
+}
+	
+	function charger(){
+		jQuery.ajax({
+ 			type : 'GET',
+			url : '/api',
+			data : {
+				charger : "r"
+			},
+			success : function(result) {
+				for (i in result){
+					var ms = result[i];
+						var r = jQuery('<div></div>').attr("class", "alert alert-info").attr("id",ms.id);
+						var res = jQuery('<div></div>').attr("class", "success").text(ms.msg+" Ajouté le "+ms.date).attr("id",ms.id);
+					var ress = jQuery('<input></input>').attr("class", "success").attr("type","button").attr("onclick","suppr('"+ms.id+"')").attr("value","Supprimer");
+					var b = jQuery('<input></input>').attr("class", "success").attr("type","button").attr("onclick","jaime('"+ms.id+"')").attr("value","J'aime");
+					var j = jQuery('<input></input>').attr("class", "success").attr("id","j"+ms.id).attr("type","button").attr("value","0").attr("onmouseover","showlikers('"+ms.id+"')");
+						r.append(res);
+						r.append(ress);
+						r.append(b);
+						r.append(j);
+						charg(ms.id);
+
+						$('#messageView').append(r);
+					
+	 				//alert( (ms).toSource() )
+				
+				}
+			},
+			error : function() {
+				console.log('ooops!');
+			}
+		}); 
+	}
+	function showlikers(id){
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				showlikers : id
+			},
+			success : function(result) {
+				//success
+				$('#j'+id).hover(
+						  function() {
+						    $( this ).append( $( "likers" )+result.users );
+						  }, function() {
+						    $( this ).find( "span:last" ).remove();
+						  }
+						);			
+			},
+			error : function() {
+				console.log('oops!');
+			}
+		});
+		
+	}
+	function charg(id) {
+		jQuery.ajax({
+			type : 'GET',
+			url : '/api',
+			data : {
+				lik : id
+			},
+			success : function(result) {
+				
+			console.log(result.nbJaime);
+ 				document.getElementById("j"+id).value = result.nbJaime;
+
+			},
+			error : function() {
+				console.log('oops! jaime!');
+			}
+			
+	});	
+		//alert( (ms).toSource() )
+}
+	
+	
+	
+	
+</script>
+</html>
